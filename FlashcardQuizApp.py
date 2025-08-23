@@ -1,5 +1,7 @@
 import json
 import os
+import random
+
 
 FILENAME = 'Flashcards.json'
 
@@ -88,6 +90,46 @@ def reviewFlashCards():
 
 def takeQuiz():
     print("you're on quiz flash card section")
+    while True:
+        try:
+            options = int(input("1.Quiz Flash Cards\n2.Return to menu\n"))
+            if options == 1:
+                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
+                    print("Your deck is empty, please first create a flash card!")
+                    data = []
+                else:
+                    with open(FILENAME, "r") as file:
+                        try:
+                            data = json.load(file)
+                        except json.JSONDecodeError:
+                            data = []
+                score = 0
+                if not data:
+                    print("No flash cards found.")
+                else:
+                    random.shuffle(data)
+                    for card in data:
+                        questionAnswer = input(f"{card['Question']} ")
+                        if questionAnswer == card['Answer'].strip().lower():
+                            print("Correct")
+                            score += 1
+                            print(f"Current score: {score}")
+                        else:
+                            print("Incorrect")
+                            print(f"Current score: {score}")
+                            print(f"Correct answer: {card['Answer']}")
+
+                    print(f"You scored {score} out of {len(data)}")
+                    print(f"Accuracy: {score/len(data)*100} %")
+
+            elif options == 2:
+                return
+            else:
+                print("Invalid option")
+                return
+
+        except ValueError:
+            print("Invalid input! Please enter a number.")
 
 
 def deleteFlashCards():
