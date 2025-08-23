@@ -134,6 +134,47 @@ def takeQuiz():
 
 def deleteFlashCards():
     print("you're on delete flash card section")
+    options = int(input("1.Delete Flash Cards\n2.Return to menu\n"))
+
+    if options == 1:
+        if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
+            print(
+                "Your deck is empty, please first create a flash card before deleting.")
+            data = []
+
+        else:
+            with open(FILENAME, "r") as file:
+                try:
+                    data = json.load(file)
+                except json.JSONDecodeError:
+                    data = []
+
+        for card in data:
+            print(
+                f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']}")
+
+        deleteSelection = (input(
+            "Please enter the flash card ID's you'd like to delete separated by commas e.g. 1,2,3: "))
+        deleteSelection = [x.strip() for x in deleteSelection.split(",")]
+
+        cardsKeep = []
+        cardsDelete = []
+
+        if not data:
+            print("No flash cards found.")
+        else:
+            for card in data:
+                if str(card["ID"]) in deleteSelection:
+                    cardsDelete.append(card)
+                else:
+                    cardsKeep.append(card)
+
+        with open(FILENAME, "w") as file:
+            for i, card in enumerate(cardsKeep, start=1):
+                card["ID"] = i
+            data = json.dump(cardsKeep, file, indent=4)
+            print(
+                f"Deleted {len(cardsDelete)} flashcards successfully!")
 
 
 def menu():
