@@ -6,48 +6,84 @@ FILENAME = 'Flashcards.json'
 
 def addFlashCards():
     print("you're on add flash card section")
-    options = int(input("1.Add Flash Card\n2.Return to menu\n"))
+    while True:
+        try:
+            options = int(input("1.Add Flash Card\n2.Return to menu\n"))
 
-    if options == 1:
-        addQuestion = input("Please input the question: ")
-        addAnswer = input("Please input the answer: ")
+            if options == 1:
+                addQuestion = input("Please input the question: ")
+                addAnswer = input("Please input the answer: ")
 
-        if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
-            data = []
-
-        else:
-            with open(FILENAME, "r") as file:
-                try:
-                    data = json.load(file)
-                except json.JSONDecodeError:
+                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
                     data = []
-        if data:
-            newId = data[-1]["ID"] + 1
-        else:
-            newId = 1
 
-        flascards = {
-            "ID": newId,
-            "Question": addQuestion,
-            "Answer": addAnswer
-        }
+                else:
+                    with open(FILENAME, "r") as file:
+                        try:
+                            data = json.load(file)
+                        except json.JSONDecodeError:
+                            data = []
+                if data:
+                    newId = data[-1]["ID"] + 1
+                else:
+                    newId = 1
 
-        data.append(flascards)
+                flascards = {
+                    "ID": newId,
+                    "Question": addQuestion,
+                    "Answer": addAnswer
+                }
 
-        with open(FILENAME, "w") as file:
-            json.dump(data, file, indent=4)
+                data.append(flascards)
 
-        print(f"Flash card {newId} added successfully!")
+                with open(FILENAME, "w") as file:
+                    json.dump(data, file, indent=4)
 
-    elif options == 2:
-        return
-    else:
-        print("Invalid Option")
-        return
+                print(f"Flash card {newId} added successfully!")
+
+            elif options == 2:
+                return
+            else:
+                print("Invalid Option")
+                return
+        except ValueError:
+            print("Invalid input! Please enter a number.")
 
 
 def reviewFlashCards():
     print("you're on review flash card section")
+    while True:
+        try:
+            options = int(input("1.Review Flash Cards\n2.Return to menu\n"))
+
+            if options == 1:
+
+                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
+                    print("Your deck is empty, please first create a flash card!")
+                    data = []
+
+                else:
+                    with open(FILENAME, "r") as file:
+                        try:
+                            data = json.load(file)
+                        except json.JSONDecodeError:
+                            data = []
+
+                if not data:
+                    print("No flash cards found.")
+                else:
+                    for card in data:
+                        print(
+                            f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']}")
+
+            elif options == 2:
+                return
+
+            else:
+                print("Invalid option")
+                return
+        except ValueError:
+            print("Invalid input! Please enter a number.")
 
 
 def takeQuiz():
@@ -61,24 +97,28 @@ def deleteFlashCards():
 def menu():
     print("Welcome to Flash Quiz, ready to learn?")
     while True:
+        try:
+            navigationOptions = int(input(
+                "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n5.Exit\n"))
 
-        navigationOptions = int(input(
-            "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n"))
+            if navigationOptions == 1:
+                addFlashCards()
+            elif navigationOptions == 2:
+                reviewFlashCards()
+            elif navigationOptions == 3:
+                takeQuiz()
+            elif navigationOptions == 4:
+                deleteFlashCards()
+            elif navigationOptions == 5:
+                exit()
+            else:
+                print("Invalid Input")
+                continue
 
-        if navigationOptions == 1:
-            addFlashCards()
-        elif navigationOptions == 2:
-            reviewFlashCards()
-        elif navigationOptions == 3:
-            takeQuiz()
-        elif navigationOptions == 4:
-            deleteFlashCards()
-        else:
-            print("Invalid Input")
-            continue
-
-        if not navigationOptions:
-            break
+            if not navigationOptions:
+                break
+        except ValueError:
+            print("Invalid input! Please enter a number.")
 
 
 menu()
