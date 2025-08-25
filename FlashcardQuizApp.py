@@ -15,6 +15,7 @@ def addFlashCards():
             if options == 1:
                 addQuestion = input("Please input the question: ")
                 addAnswer = input("Please input the answer: ")
+                addCategory = input("Please input the category: ")
 
                 if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
                     data = []
@@ -33,7 +34,8 @@ def addFlashCards():
                 flascards = {
                     "ID": newId,
                     "Question": addQuestion,
-                    "Answer": addAnswer
+                    "Answer": addAnswer,
+                    "Category": addCategory
                 }
 
                 data.append(flascards)
@@ -76,7 +78,7 @@ def reviewFlashCards():
                 else:
                     for card in data:
                         print(
-                            f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']}")
+                            f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']} | C: {card['Category']} ")
 
             elif options == 2:
                 return
@@ -104,23 +106,64 @@ def takeQuiz():
                         except json.JSONDecodeError:
                             data = []
                 score = 0
+                attempts = 0
                 if not data:
                     print("No flash cards found.")
                 else:
-                    random.shuffle(data)
+                    categories = {}
+                    cat_id = 1
                     for card in data:
-                        questionAnswer = input(f"{card['Question']} ")
-                        if questionAnswer == card['Answer'].strip().lower():
-                            print("Correct")
-                            score += 1
-                            print(f"Current score: {score}")
-                        else:
-                            print("Incorrect")
-                            print(f"Current score: {score}")
-                            print(f"Correct answer: {card['Answer']}")
+                        if card['Category'] not in categories.values():
+                            categories[cat_id] = card['Category']
+                            cat_id += 1
 
-                    print(f"You scored {score} out of {len(data)}")
-                    print(f"Accuracy: {score/len(data)*100} %")
+                    print("Category List:")
+                    for cid, cname in categories.items():
+                        print(f"   {cid}. {cname}")
+
+                    categorySelection = int(input(
+                        "Please select the number of the category you'd like to quiz or enter 0 to quiz on all flashcards\n"))
+
+                    if categorySelection == 0:
+                        random.shuffle(data)
+                        for card in data:
+                            questionAnswer = input(f"{card['Question']} ")
+                            if questionAnswer.strip().lower() == card['Answer'].strip().lower():
+                                print("Correct")
+                                score += 1
+                                print(f"Current score: {score}")
+                            else:
+                                print("Incorrect")
+                                print(f"Current score: {score}")
+                                print(f"Correct answer: {card['Answer']}")
+
+                        print(f"You scored {score} out of {len(data)}")
+                        print(f"Accuracy: {score/len(data)*100} %")
+
+                    else:
+                        selectedCategory = categories.get(categorySelection)
+                        quizCards = [
+                            c for c in data if c["Category"] == selectedCategory]
+
+                        random.shuffle(data)
+                        for card in quizCards:
+                            questionAnswer = input(f"{card['Question']} ")
+                            if questionAnswer.strip().lower() == card['Answer'].strip().lower():
+                                print("Correct")
+                                score += 1
+                                print(f"Current score: {score}")
+                            else:
+                                print("Incorrect")
+                                print(f"Current score: {score}")
+                                print(f"Correct answer: {card['Answer']}")
+
+                        print(f"You scored {score} out of {len(quizCards)}")
+                        print(f"Accuracy: {score/len(quizCards)*100} %")
+                        attempts = +1
+                        stats = {
+                            "Attempts": attempts,
+
+                        }
 
             elif options == 2:
                 return
@@ -151,7 +194,7 @@ def deleteFlashCards():
 
         for card in data:
             print(
-                f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']}")
+                f"ID: {card['ID']} | Q: {card['Question']} | A: {card['Answer']} | C: {card['Category']} ")
 
         deleteSelection = (input(
             "Please enter the flash card ID's you'd like to delete separated by commas e.g. 1,2,3: "))
@@ -177,12 +220,16 @@ def deleteFlashCards():
                 f"Deleted {len(cardsDelete)} flashcards successfully!")
 
 
+def viewStats():
+    print("you're on view stats")
+
+
 def menu():
     print("Welcome to Flash Quiz, ready to learn?")
     while True:
         try:
             navigationOptions = int(input(
-                "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n5.Exit\n"))
+                "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n5. View your stats\n6.Exit\n"))
 
             if navigationOptions == 1:
                 addFlashCards()
@@ -193,6 +240,8 @@ def menu():
             elif navigationOptions == 4:
                 deleteFlashCards()
             elif navigationOptions == 5:
+                viewStats()
+            elif navigationOptions == 6:
                 exit()
             else:
                 print("Invalid Input")

@@ -2,11 +2,25 @@
     {
         "ID": 1,
         "Question": "test",
-        "Answer": "test"
+        "Answer": "test",
+        "Category": "math"
     },
     {
         "ID": 2,
         "Question": "test",
-        "Answer": "test"
+        "Answer": "test",
+        "Category": "science"
+    },
+    {
+        "ID": 3,
+        "Question": "test",
+        "Answer": "test",
+        "Category": "history"
+    },
+    {
+        "ID": 4,
+        "Question": "mathq",
+        "Answer": "mathq",
+        "Category": "math"
     }
 ]
