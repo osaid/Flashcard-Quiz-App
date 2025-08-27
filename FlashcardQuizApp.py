@@ -4,6 +4,7 @@ import random
 
 
 FILENAME = 'Flashcards.json'
+STATS_FILE = 'Stats.json'
 
 
 def addFlashCards():
@@ -105,8 +106,8 @@ def takeQuiz():
                             data = json.load(file)
                         except json.JSONDecodeError:
                             data = []
+
                 score = 0
-                attempts = 0
                 if not data:
                     print("No flash cards found.")
                 else:
@@ -145,7 +146,7 @@ def takeQuiz():
                         quizCards = [
                             c for c in data if c["Category"] == selectedCategory]
 
-                        random.shuffle(data)
+                        random.shuffle(quizCards)
                         for card in quizCards:
                             questionAnswer = input(f"{card['Question']} ")
                             if questionAnswer.strip().lower() == card['Answer'].strip().lower():
@@ -159,11 +160,8 @@ def takeQuiz():
 
                         print(f"You scored {score} out of {len(quizCards)}")
                         print(f"Accuracy: {score/len(quizCards)*100} %")
-                        attempts = +1
-                        stats = {
-                            "Attempts": attempts,
-
-                        }
+                        accuracy = score/len(quizCards) * 100
+                        updateStats(accuracy)
 
             elif options == 2:
                 return
@@ -221,7 +219,49 @@ def deleteFlashCards():
 
 
 def viewStats():
-    print("you're on view stats")
+    while True:
+        try:
+            statsOptions = int(input("1.View Stats\n2.Return to menu\n"))
+            if statsOptions == 1:
+                if not os.path.exists(STATS_FILE) or os.stat(STATS_FILE).st_size == 0:
+                    print("No stats found, please complete a quiz to view stats")
+                    continue
+
+                with open(STATS_FILE, "r") as file:
+                    try:
+                        stats = json.load(file)
+                    except json.JSONDecodeError:
+                        print("No stats found")
+                        continue
+                print(
+                    f"Total Attempts: {stats['Attempts']} Average Accuracy: {stats['AverageAccuracy']: .2f} % \n")
+            elif statsOptions == 2:
+                return
+            else:
+                print("Invalid option")
+                return
+        except ValueError:
+            print("Invalid input! Please enter a number.")
+
+
+def updateStats(accuracy):
+    if not os.path.exists(STATS_FILE) or os.stat(STATS_FILE).st_size == 0:
+        stats = {"Attempts": 0, "TotalAccuracy": 0}
+    else:
+        with open(STATS_FILE, "r") as file:
+            try:
+                stats = json.load(file)
+            except json.JSONDecodeError:
+                stats = {"Attempts": 0, "TotalAccuracy": 0}
+
+    stats["Attempts"] += 1
+    stats["TotalAccuracy"] += accuracy  # accumulate
+    stats["AverageAccuracy"] = stats["TotalAccuracy"] / stats["Attempts"]
+
+    with open(STATS_FILE, "w") as file:
+        json.dump(stats, file, indent=4)
+
+    # print(f"Updated Stats: {stats}")
 
 
 def menu():
@@ -229,7 +269,7 @@ def menu():
     while True:
         try:
             navigationOptions = int(input(
-                "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n5. View your stats\n6.Exit\n"))
+                "1.Add Flash Card\n2.Review Flashcards\n3.Take a Quiz\n4.Delete Flashcards\n5.View your stats\n6.Exit\n"))
 
             if navigationOptions == 1:
                 addFlashCards()
