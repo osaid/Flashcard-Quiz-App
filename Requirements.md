@@ -12,4 +12,4 @@
 - Search flashcards by keyword
 - Save flashcards to a file and load them later (Json) (IMPLEMENTED)
 - Add categories (math, science, history) (IMPLEMENTED)
-- Track user stats (In Progress)
+- Track user stats (IMPLEMENTED)
