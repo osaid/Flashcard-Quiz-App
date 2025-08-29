@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import ReuseFuncs  # utility file
 
 FILENAME = 'Flashcards.json'
 STATS_FILE = 'Stats.json'
@@ -23,15 +24,9 @@ def addFlashCards():
                 addCategory = input("Please input the category: ")
 
                 # Load existing flashcards, handle empty or missing file
-                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
-                    data = []
-                else:
-                    with open(FILENAME, "r") as file:
-                        try:
-                            data = json.load(file)
-                        except json.JSONDecodeError:
-                            data = []
+                data = ReuseFuncs.addFlashcardsloadJson()
 
+                # print(data)
                 # Determine next ID
                 if data:
                     newId = data[-1]["ID"] + 1
@@ -74,15 +69,7 @@ def reviewFlashCards():
             options = int(input("1.Review Flash Cards\n2.Return to menu\n"))
 
             if options == 1:
-                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
-                    print("Your deck is empty, please first create a flash card!")
-                    data = []
-                else:
-                    with open(FILENAME, "r") as file:
-                        try:
-                            data = json.load(file)
-                        except json.JSONDecodeError:
-                            data = []
+                data = ReuseFuncs.loadJson()
 
                 if not data:
                     print("No flash cards found.")
@@ -113,15 +100,7 @@ def takeQuiz():
             options = int(input("1.Quiz Flash Cards\n2.Return to menu\n"))
             if options == 1:
                 # Load flashcards
-                if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
-                    print("Your deck is empty, please first create a flash card!")
-                    data = []
-                else:
-                    with open(FILENAME, "r") as file:
-                        try:
-                            data = json.load(file)
-                        except json.JSONDecodeError:
-                            data = []
+                data = ReuseFuncs.loadJson()
 
                 score = 0
                 if not data:
@@ -197,15 +176,7 @@ def deleteFlashCards():
     options = int(input("1.Delete Flash Cards\n2.Return to menu\n"))
 
     if options == 1:
-        if not os.path.exists(FILENAME) or os.stat(FILENAME).st_size == 0:
-            print("Your deck is empty, please first create a flash card before deleting.")
-            data = []
-        else:
-            with open(FILENAME, "r") as file:
-                try:
-                    data = json.load(file)
-                except json.JSONDecodeError:
-                    data = []
+        data = ReuseFuncs.loadJson()
 
         # Show all flashcards for selection
         for card in data:
